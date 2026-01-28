@@ -7,14 +7,21 @@ abstract class Videojoc<T> {
   final double preuCompra;
   final double preuLloguer;
 
-  Map<String, T> puntuacions = {};
-  Videojoc(this.nom, this.codi, this.estil, this.preuCompra,this.preuLloguer);
+  // CORRECCIÓN: El requisito pide una lista de puntuaciones por usuario
+  Map<String, List<T>> puntuacions = {};
+
+  Videojoc(this.nom, this.codi, this.estil, this.preuCompra, this.preuLloguer);
 
   String get repteDelDia;
 
+  // Método abstracto que obligará a las hijas a definir cómo se ordena su ranking
   String mostrarHighScores();
 
   void registrarPuntuacio(String email, T puntuacio) {
-    puntuacions[email] = puntuacio;
+    // Si no existe la lista para este usuario, la crea
+    if (!puntuacions.containsKey(email)) {
+      puntuacions[email] = [];
+    }
+    puntuacions[email]!.add(puntuacio);
   }
 }
