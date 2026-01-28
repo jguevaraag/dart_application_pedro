@@ -1,6 +1,6 @@
+//Aquesta extensió afegeix una funció per validar si un correu electrònic és vàlid.
 extension ValidacioEmail on String {
   bool isValidEmail() {
-    // Lógica simple: contiene @ y .
     return contains('@') && contains('.');
   }
 }
