@@ -147,75 +147,40 @@ class UsuariView {
     print("--- DONAR JOC ---");
     var me = Dades().usuariActiu!;
 
-    // Validem que tingui llicències per donar.
     if (me.llicencies.isEmpty) {
-      print("Error: No tens cap llicència per donar.");
+      print("No tens llicències per donar.");
       return;
     }
-
-    // Mostrem les llicències disponibles.
-    print("Les teves llicències:");
+    // Llistar llicències.
     for (int i = 0; i < me.llicencies.length; i++) {
-      //Accedim a la llicència i la mostrem.
-      var llicencia = me.llicencies[i];
+      var l = me.llicencies[i];
       print(
-        "[$i] ID: ${llicencia.id} - Tipus: ${llicencia.tipus.name} - Canvis restants: ${llicencia.canvisPropietariRestants}",
+        "[$i] ID: ${l.id} - Tipus: ${l.tipus.name} - Canvis restants: ${l.canvisPropietariRestants}",
       );
     }
 
-    // Pedim quina llicència donar.
-    stdout.write("Tria el NÚMERO de la llicència a donar: ");
-    // Transformem l'entrada a int.
+    // Demanar index.
+    stdout.write("Tria el número de la llicència a donar: ");
     int? index = int.tryParse(stdin.readLineSync() ?? "");
 
     if (index == null || index < 0 || index >= me.llicencies.length) {
-      print("Error: Selecció no vàlida.");
+      print("Selecció no vàlida.");
       return;
     }
 
-    var llicenciaADonar = me.llicencies[index];
+    Llicencia llicencia = me.llicencies[index];
 
-    //Validem que la llicència es pugui transferir.
-    if (llicenciaADonar.canvisPropietariRestants <= 0) {
-      print("Error: Aquesta llicència ja no es pot transferir més cops.");
-      return;
-    }
-
-    // Demanem l'email de l'amic receptor.
+    // Demanar receptor.
     stdout.write("Escriu l'EMAIL de l'amic receptor: ");
     String emailAmic = stdin.readLineSync() ?? "";
 
-    // Mirem si aquest usuari existex en la llista d'amics.
-    if (!me.amics.contains(emailAmic)) {
-      print(
-        "Error: Aquest usuari no està a la teva llista d'amics. Afegeix-lo primer!",
-      );
-      return;
-    }
+    // Deleguem la lògica al model Dades.
+    String? resultat = Dades().transferirLlicencia(me, emailAmic, llicencia);
 
-    // Mirem la llista d'usuaris per trobar l'amic receptor.
-    try {
-      // Llancem excepcio si no troba l'usuari.
-      var usuariReceptor = Dades().llistaUsuaris.firstWhere(
-        (u) => u.email == emailAmic,
-      );
-
-      //Restem un intent de transferencia i fem el canvi.
-      if (llicenciaADonar.intentarTransferencia()) {
-        // Eliminem la llicència de l'usuari actual.
-        me.llicencies.removeAt(index);
-
-        // La fiquem a l'usuari receptor.
-        usuariReceptor.llicencies.add(llicenciaADonar);
-
-        print(
-          "ÈXIT! Has donat la llicència ${llicenciaADonar.id} a $emailAmic.",
-        );
-      }
-    } catch (e) {
-      print(
-        "Error: L'usuari $emailAmic no existeix a la base de dades (ningú s'ha registrat amb aquest mail).",
-      );
+    if (resultat == null) {
+      print("ÈXIT! Has donat la llicència ${llicencia.id} a $emailAmic.");
+    } else {
+      print(resultat);
     }
   }
 }
