@@ -32,4 +32,12 @@ class Llicencia {
     var random = Random();
     return "LIC-${random.nextInt(999999)}";
   }
+
+  bool intentarTransferencia() {
+    if (canvisPropietariRestants > 0) {
+      canvisPropietariRestants--; //Restem un us a l'intent de transferencia.
+      return true;
+    }
+    return false;
+  }
 }
